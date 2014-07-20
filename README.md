@@ -1,4 +1,4 @@
-Mosquito Messager (MQTT Chat)
+Mosquito Message (MQTT Chat)
 =============
 
 This is a proof of concept of a MQTT based chat app writen for iOS.
