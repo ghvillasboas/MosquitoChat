@@ -16,9 +16,13 @@ To run it, clone this repository and run the command:
 In our tests, we deployed our own MQTT broker. But out of the box, we're using Eclipse.org (iot.eclipse.org)
 Please be gentile and don't abuse their service.
 
-Screenshots:
+#### Screenshots:
 
 ![Mosquito Chat Screenshots](https://raw.github.com/ghvillasboas/MosquitoChat/master/images/mosquitoChat.png)
+
+#### Video:
+
+https://www.youtube.com/watch?v=VIjlVTf_Lhs
 
 ## Questions?
 
