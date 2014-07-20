@@ -26,7 +26,7 @@ https://www.youtube.com/watch?v=VIjlVTf_Lhs
 
 ## Questions?
 
-Just fire an Issue or give me a pull request.
+Just fire an Issue or ping me on Twitter (@ghvillasboas)
 
 ## Contributions?
 
