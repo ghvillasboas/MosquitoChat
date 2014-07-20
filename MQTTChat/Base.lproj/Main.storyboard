@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6185.7" systemVersion="14A283o" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="1AI-d8-6YZ">
     <dependencies>
-        <deployment defaultVersion="1808" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6181.2"/>
     </dependencies>
     <scenes>
@@ -19,13 +18,12 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="d10-D7-byG">
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="rDH-hK-5aa">
+                        <barButtonItem key="rightBarButtonItem" id="rDH-hK-5aa">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="hfo-6t-B5o">
                                 <rect key="frame" x="-23" y="-15" width="106" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Logoff">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="15"/>
+                                <state key="normal" title="Logoff"/>
                                 <connections>
                                     <action selector="logoff:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="0OJ-sK-idq"/>
                                 </connections>
@@ -40,13 +38,16 @@
         <!--Navigation Controller-->
         <scene sceneID="Qxc-v5-evX">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="1AI-d8-6YZ" sceneMemberID="viewController">
+                <navigationController extendedLayoutIncludesOpaqueBars="YES" automaticallyAdjustsScrollViewInsets="NO" id="1AI-d8-6YZ" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="20I-LW-icL">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="rmt-VI-Uqp">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="u4U-9m-Wej" kind="relationship" relationship="rootViewController" id="yaa-s1-EOI"/>
                     </connections>
@@ -58,7 +59,7 @@
         <!--Please Login-->
         <scene sceneID="2s3-Ca-MJZ">
             <objects>
-                <viewController id="u4U-9m-Wej" customClass="LoginViewController" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="u4U-9m-Wej" customClass="LoginViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zzS-vJ-Rw0"/>
                         <viewControllerLayoutGuide type="bottom" id="cDg-Dl-USY"/>
@@ -89,14 +90,19 @@
                                     <action selector="loginToTwiiter:" destination="u4U-9m-Wej" eventType="touchUpInside" id="7ef-MQ-zWM"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="aDd-AS-oiT">
+                                <rect key="frame" x="222" y="290" width="37" height="37"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="centerX" secondItem="aDd-AS-oiT" secondAttribute="centerX" constant="-0.5" id="1WD-KW-c83"/>
                             <constraint firstItem="YRS-sc-dYv" firstAttribute="centerX" secondItem="BBe-rs-T3n" secondAttribute="centerX" id="51c-CX-DC6"/>
                             <constraint firstItem="YRS-sc-dYv" firstAttribute="leading" secondItem="jIN-3A-VlB" secondAttribute="leading" id="534-Dq-miw"/>
                             <constraint firstAttribute="trailing" secondItem="Gic-hz-sPv" secondAttribute="trailing" id="DXW-dF-dLR"/>
                             <constraint firstItem="cDg-Dl-USY" firstAttribute="top" secondItem="Gic-hz-sPv" secondAttribute="bottom" id="Uye-Kx-DnP"/>
                             <constraint firstItem="YRS-sc-dYv" firstAttribute="centerY" secondItem="BBe-rs-T3n" secondAttribute="centerY" constant="4.5" id="gK2-ru-e6O"/>
+                            <constraint firstItem="YRS-sc-dYv" firstAttribute="top" secondItem="aDd-AS-oiT" secondAttribute="bottom" constant="8" id="h8C-Rl-vAD"/>
                             <constraint firstItem="cDg-Dl-USY" firstAttribute="top" secondItem="YRS-sc-dYv" secondAttribute="bottom" id="noG-XU-0JW"/>
                             <constraint firstAttribute="trailing" secondItem="YRS-sc-dYv" secondAttribute="trailing" id="pkn-em-iqq"/>
                             <constraint firstAttribute="centerX" secondItem="BBe-rs-T3n" secondAttribute="centerX" id="tFL-0t-HB9"/>
@@ -109,6 +115,7 @@
                         <outlet property="loginButton" destination="BBe-rs-T3n" id="exV-Z6-gRM"/>
                         <outlet property="loginButtonView" destination="YRS-sc-dYv" id="OP0-mQ-jOE"/>
                         <outlet property="loginButtonViewConstraint" destination="noG-XU-0JW" id="KFu-xo-Xte"/>
+                        <outlet property="spinner" destination="aDd-AS-oiT" id="j63-1q-KPV"/>
                         <segue destination="vXZ-lx-hvc" kind="show" identifier="showChatSegue" id="Yaf-NS-WnQ"/>
                     </connections>
                 </viewController>

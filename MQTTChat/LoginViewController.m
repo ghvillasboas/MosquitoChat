@@ -15,46 +15,25 @@
 @property (weak, nonatomic) IBOutlet UIView *loginButtonView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *loginButtonViewConstraint;
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 @end
 
 @implementation LoginViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
-}
+#pragma mark -
+#pragma mark Getters overriders
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userKey"]) {
-        [self performSegueWithIdentifier:@"showChatSegue" sender:self];
-    }
-    
-    // prepare uiview animation
-    self.loginButtonViewConstraint.constant = -CGRectGetHeight(self.loginButtonView.frame);
-    self.loginButton.alpha = 0.0;
-    
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
-}
+#pragma mark -
+#pragma mark Setters overriders
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    // animate the login.
-    // just eye candy
-    self.loginButtonViewConstraint.constant = 0;
-    [UIView animateWithDuration:1.0 animations:^{
-        [self.view layoutIfNeeded];
-    } completion:^(BOOL finished) {
-        
-        [UIView animateWithDuration:0.5 animations:^{
-            self.loginButton.alpha = 1.0;
-        }];
-    }];
-}
+#pragma mark -
+#pragma mark Designated initializers
+
+#pragma mark -
+#pragma mark Public methods
+
+#pragma mark -
+#pragma mark Private methods
 
 /**
  *  Send the request to twitter using a givin account
@@ -70,7 +49,7 @@
         if (!error) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:responseData options:kNilOptions error:nil];
             
-            if (!json[@"error"]) {
+            if (!json[@"errors"]) {
                 NSURL *imageURL = [NSURL URLWithString:json[@"profile_image_url"]];
                 NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
                 UIImage *image = [UIImage imageWithData:imageData];
@@ -116,20 +95,75 @@
     });
 }
 
-
-#pragma mark UIActionSheet Delegates
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+/**
+ *  Shows an alert with a given title and message.
+ *
+ *  @param title   The title
+ *  @param message The message
+ */
+- (void)showAlertWithTitle:(NSString *)title andMessage:(NSString *)message
 {
-    NSString *username = [actionSheet buttonTitleAtIndex:buttonIndex];
-    ACAccount *account = (ACAccount *)[[self.twitterAccounts filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"username == %@", username]] lastObject];
-    
-    if (account) [self sendRequestToTwitterUsingAccount:account];
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        
+        [self.spinner stopAnimating];
+    });
 }
+
+#pragma mark -
+#pragma mark ViewController life cycle
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"userKey"]) {
+        [self performSegueWithIdentifier:@"showChatSegue" sender:self];
+    }
+    
+    // prepare uiview animation
+    self.loginButtonViewConstraint.constant = -CGRectGetHeight(self.loginButtonView.frame);
+    self.loginButton.alpha = 0.0;
+    
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    // animate the login.
+    // just eye candy
+    self.loginButtonViewConstraint.constant = 0;
+    [UIView animateWithDuration:1.0 animations:^{
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            self.loginButton.alpha = 1.0;
+        }];
+    }];
+}
+
+#pragma mark -
+#pragma mark Overriden methods
+
+#pragma mark -
+#pragma mark Storyboards Segues
+
+#pragma mark -
+#pragma mark Target/Actions
 
 - (IBAction)loginToTwiiter:(id)sender
 {
+    
+    [self.spinner startAnimating];
     
     ACAccountStore *accountStore = [[ACAccountStore alloc] init];
     
@@ -167,18 +201,21 @@
     }];
 }
 
-/**
- *  Shows an alert with a given title and message.
- *
- *  @param title   The title
- *  @param message The message
- */
-- (void)showAlertWithTitle:(NSString *)title andMessage:(NSString *)message
+#pragma mark -
+#pragma mark Delegates
+
+#pragma mark UIActionSheet Delegates
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-    });
+    NSString *username = [actionSheet buttonTitleAtIndex:buttonIndex];
+    ACAccount *account = (ACAccount *)[[self.twitterAccounts filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"username == %@", username]] lastObject];
+    
+    if (account) [self sendRequestToTwitterUsingAccount:account];
+    
 }
+
+#pragma mark -
+#pragma mark Notification center
 
 @end

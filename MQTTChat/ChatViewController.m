@@ -9,10 +9,9 @@
 #import "ChatViewController.h"
 #import <MQTTKit.h>
 
-#define kMQTTServerHost @"localhost"
-
-// Please, dont abuse of our Mosquitto.org friend's server!
-//#define kMQTTServerHost @"test.mosquitto.org"
+// Please, dont abuse the server of our dear friends at Eclipse.org!
+// Consider deploying your own!
+#define kMQTTServerHost @"iot.eclipse.org"
 #define kTopic @"mosquitochat/ghvillasboas"
 
 @interface ChatViewController ()
@@ -102,12 +101,17 @@
             }
         });
     }];
-    
-    // connect the MQTT client
+}
+
+/**
+ *  Connects to the broker
+ */
+- (void)connectoToMQTTBroker
+{
     [self.client connectToHost:kMQTTServerHost completionHandler:^(MQTTConnectionReturnCode code) {
         if (code == ConnectionAccepted) {
             // The client is connected when this completion handler is called
-            NSLog(@"client is connected with id %@", clientID);
+            NSLog(@"client is connected with id %@", self.client.clientID);
             // Subscribe to the topic
             [self.client subscribe:kTopic withCompletionHandler:^(NSArray *grantedQos) {
                 // The client is effectively subscribed to the topic when this completion handler is called
@@ -174,10 +178,33 @@
     
     if (namesTokens.count > 0) {
         if (namesTokens.count == 1) initials = [[username substringToIndex:2] uppercaseString];
-        else initials = [NSString stringWithFormat:@"%@ %@", namesTokens.firstObject, namesTokens.lastObject];
+        else {
+            initials = [[NSString stringWithFormat:@"%@%@", [namesTokens.firstObject substringToIndex:1], [namesTokens.lastObject substringToIndex:1]] uppercaseString];
+        }
     }
     
     return initials;
+}
+
+/**
+ *  Posts message to MQTT broker
+ *
+ *  @param message The message object
+ */
+- (void)postMessageToBroker:(JSQMessage *)message
+{
+    // when the client is connected, send a MQTT message
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
+    NSString *strDate = [dateFormatter stringFromDate:[NSDate date]];
+    
+    [self.client publishString:[NSString stringWithFormat:@"{\"text\": \"%@\",\"sender\":\"%@\", \"date\":\"%@\"}", message.text, message.sender, strDate]
+                       toTopic:kTopic
+                       withQos:AtMostOnce
+                        retain:NO
+             completionHandler:^(int mid) {
+                 NSLog(@"message has been delivered to MQTT broker");
+             }];
 }
 
 #pragma mark -
@@ -208,6 +235,16 @@
     [self.navigationItem setHidesBackButton:YES animated:YES];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    // connect the MQTT client
+    if (!self.client.connected) {
+        [self connectoToMQTTBroker];
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
@@ -218,6 +255,17 @@
      *  Note: this feature is mostly stable, but still experimental
      */
     self.collectionView.collectionViewLayout.springinessEnabled = YES;
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    // disconnect the MQTT client
+    [self.client disconnectWithCompletionHandler:^(NSUInteger code) {
+        // The client is disconnected when this completion handler is called
+        NSLog(@"MQTT is disconnected");
+    }];
 }
 
 #pragma mark -
@@ -247,24 +295,18 @@
 {
     // connect to the MQTT server
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.client connectToHost:kMQTTServerHost
-                 completionHandler:^(NSUInteger code) {
-                     if (code == ConnectionAccepted) {
-                         // when the client is connected, send a MQTT message
-                         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                         [dateFormatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
-                         NSString *strDate = [dateFormatter stringFromDate:[NSDate date]];
-                         
-                         [self.client publishString:[NSString stringWithFormat:@"{\"text\": \"%@\",\"sender\":\"%@\", \"date\":\"%@\"}", message.text, message.sender, strDate]
-                                            toTopic:kTopic
-                                            withQos:AtMostOnce
-                                             retain:NO
-                                  completionHandler:^(int mid) {
-                                      NSLog(@"message has been delivered to MQTT broker");
-                                  }];
-                     }
-                 }];
         
+        if (self.client.connected) {
+            [self postMessageToBroker:message];
+        }
+        else{
+            [self.client connectToHost:kMQTTServerHost
+                     completionHandler:^(NSUInteger code) {
+                         if (code == ConnectionAccepted) {
+                             [self postMessageToBroker:message];
+                         }
+                     }];
+        }
     });
 }
 
