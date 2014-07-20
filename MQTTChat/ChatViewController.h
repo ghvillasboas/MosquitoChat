@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  ChatViewController.h
 //  MQTTChat
 //
 //  Created by George Villasboas on 7/18/14.
@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <JSQMessagesViewController/JSQMessages.h>
 
-@interface ViewController : UIViewController
-
+@interface ChatViewController : JSQMessagesViewController
 
 @end
-
